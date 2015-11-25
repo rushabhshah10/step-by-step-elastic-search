@@ -43,7 +43,7 @@ public class IndexerSearcher {
 		                        .field("technology","SQL")
 		                        .field("item","Performance")
 		                        .field("description", "Manages DB performance.")
-		                        .field("Highlight","Recommended by Westpac and BTFG")
+		                        .field("Highlight","Newly Released.")
 		                    .endObject()
 		                  )
 		        .get();
