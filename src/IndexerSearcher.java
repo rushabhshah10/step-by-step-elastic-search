@@ -31,6 +31,90 @@ public class IndexerSearcher {
 	
 	public static void main(String[] args){
 		try{
+			
+		Settings settings1 = Settings.settingsBuilder().put("cluster.name", "thor").loadFromSource(jsonBuilder()
+                .startObject()
+                    //disable dynamic mapping adding, set it to false 
+                    .field("index.mapper.dynamic", false)
+                    //Add analyzer settings
+                    .startObject("analysis")
+                        .startObject("filter")
+                            .startObject("my_stopwordcustom_filter")
+                                .field("type", "stop")    
+                                .field("stopwords_path", "stopwords/stop_" + "en_EN")
+                            .endObject()
+                            .startObject("my_snowball_filter")
+                                .field("type", "snowball")
+                                .field("language", "English")
+                            .endObject()
+                            .startObject("my_Worddelimiter_filter")
+                                .field("type", "word_delimiter")
+                                .field("protected_words_path", "worddelimiters/protectedwords_" + "en_EN")
+                                .field("type_table_path", "worddelimiters/typetable")
+                                .field("split_on_numerics", "true")
+                                .field("generate_number_parts", "true")
+                                .field("preserve_original", "true")
+                            .endObject()
+                            .startObject("my_synonym_filter")
+                                .field("type", "synonym")
+                                .field("synonyms_path", "synonyms/synonyms_" + "en_EN")
+                                .field("ignore_case", true)
+                                .field("expand", true)
+                            .endObject()
+                            .startObject("my_ShingleToken_filter")
+                                .field("type", "shingle")
+                                .field("min_shingle_size", 2)
+                                .field("max_shingle_size", 4)
+                            .endObject()
+                            .startObject("my_edgeNGram_filter")
+                                .field("type", "edgeNGram")
+                                .field("min_gram", 4)
+                                .field("max_gram", 30)
+                            .endObject()
+                      .endObject()
+                        .startObject("analyzer")
+                            .startObject("my_standard_text_analyzer")
+                                .field("type", "custom")
+                                .field("tokenizer", "standard")
+                                .field("filter", new String[]{"lowercase", 
+                                		"my_stopwordcustom_filter", 
+                                		"my_synonym_filter",
+                                        "my_snowball_filter" 
+                                        })
+                            .endObject()
+                            .startObject("my_freetext_analyzer")
+                                .field("type", "custom")
+                                .field("tokenizer", "whitespace")
+                                .field("filter", new String[]{("lowercase"), 
+                                		"my_Worddelimiter_filter", 
+                                		"my_stopwordcustom_filter", 
+                                		"my_synonym_filter",
+                                		"my_snowball_filter" 
+                                        })
+                               .field("char_filter", "html_strip")                                             
+                            .endObject()
+                            .startObject("my_autosuggestion_analyzer")
+                                .field("type", "custom")
+                                .field("tokenizer", "keyword")
+                                .field("filter", new String[]{"lowercase"
+//                                                                            config.getNGramTokenFilterName()
+                                 							 })
+                            .endObject()
+                            .startObject("my_facet_analyzer")
+                                .field("type", "custom")
+                                .field("tokenizer", "standard")
+                                .field("filter", new String[]{"lowercase", 
+                                		"my_snowball_filter", 
+                                		"my_synonym_filter"
+                                        })
+                            .endObject()
+                        .endObject()
+                    .endObject()
+                .endObject().string()).build();
+		
+		
+		
+			
 		Settings settings = Settings.settingsBuilder()
 		        .put("cluster.name", "thor").build();
 		Client client = TransportClient.builder().settings(settings).build()
